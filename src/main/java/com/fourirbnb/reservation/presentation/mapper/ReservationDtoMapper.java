@@ -9,6 +9,7 @@ import com.fourirbnb.reservation.presentation.dto.UpdateReservationDto;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
 public class ReservationDtoMapper {
 
   public static CreateReservationInternalDto toCreateInternalDto(CreateReservationDto request) {
