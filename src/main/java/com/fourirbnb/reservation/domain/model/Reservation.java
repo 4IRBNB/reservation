@@ -1,0 +1,55 @@
+package com.fourirbnb.reservation.domain.model;
+
+import com.fourirbnb.common.domain.BasicEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import java.time.LocalDateTime;
+import java.util.UUID;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Getter
+@NoArgsConstructor
+@Entity
+@Table(name = "p_reservation")
+public class Reservation extends BasicEntity {
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  @Column(name = "reservation_id", updatable = false, nullable = false)
+  private UUID id;
+
+  @Column(nullable = false)
+  private Long userId;
+
+  @Column(nullable = false)
+  private UUID lodgeId;
+
+  @Column(nullable = false)
+  private Long price;
+
+  @Column(nullable = false)
+  private LocalDateTime checkInDate;
+
+  @Column(nullable = false)
+  private LocalDateTime checkOutDate;
+
+  @Column(nullable = false)
+  private ReservationStatus reservationStatus;
+
+  public Reservation(Long userId, UUID lodgeId, Long price, LocalDateTime checkInDate,
+      LocalDateTime checkOutDate, ReservationStatus reservationStatus) {
+
+    this.userId = userId;
+    this.lodgeId = lodgeId;
+    this.price = price;
+    this.checkInDate = checkInDate;
+    this.checkOutDate = checkOutDate;
+    this.reservationStatus = reservationStatus;
+  }
+}
