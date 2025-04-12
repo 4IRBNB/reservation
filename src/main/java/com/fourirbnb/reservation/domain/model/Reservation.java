@@ -1,6 +1,6 @@
 package com.fourirbnb.reservation.domain.model;
 
-import com.fourirbnb.common.domain.BasicEntity;
+import com.fourirbnb.common.domain.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Table(name = "p_reservation")
-public class Reservation extends BasicEntity {
+public class Reservation extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
