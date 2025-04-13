@@ -1,6 +1,6 @@
 package com.fourirbnb.reservation.domain.model;
 
-import com.fourirbnb.common.domain.BasicEntity;
+import com.fourirbnb.common.domain.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,7 +9,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.UUID;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -17,11 +16,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Table(name = "p_reservation")
-public class Reservation extends BasicEntity {
+public class Reservation extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  @Column(name = "reservation_id", updatable = false, nullable = false)
+  @Column(updatable = false, nullable = false)
   private UUID id;
 
   @Column(nullable = false)

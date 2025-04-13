@@ -1,6 +1,7 @@
 package com.fourirbnb.reservation.infrastructure.repository;
 
 import com.fourirbnb.reservation.domain.model.Reservation;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 

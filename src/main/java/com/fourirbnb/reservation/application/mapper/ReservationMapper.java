@@ -11,7 +11,7 @@ import org.springframework.data.domain.PageImpl;
 
 public class ReservationMapper {
 
-  public Reservation toEntity(CreateReservationInternalDto request) {
+  public static Reservation toEntity(CreateReservationInternalDto request) {
     return new Reservation(
         request.userId(),
         request.lodgeId(),
@@ -22,7 +22,7 @@ public class ReservationMapper {
     );
   }
 
-  public ReservationResponseInternalDto toResponse(Reservation reservation) {
+  public static ReservationResponseInternalDto toResponse(Reservation reservation) {
     return new ReservationResponseInternalDto(
         reservation.getId(),
         reservation.getUserId(),
@@ -34,17 +34,18 @@ public class ReservationMapper {
     );
   }
 
-  public List<ReservationResponseInternalDto> toResponseList(List<Reservation> reservationList) {
+  public static List<ReservationResponseInternalDto> toResponseList(
+      List<Reservation> reservationList) {
     return reservationList.stream()
-        .map(this::toResponse)
+        .map(ReservationMapper::toResponse)
         .collect(Collectors.toList());
   }
 
-  public Page<ReservationResponseInternalDto> toResponsePage(Page<Reservation> reservationPage) {
+  public static Page<ReservationResponseInternalDto> toResponsePage(
+      Page<Reservation> reservationPage) {
     List<ReservationResponseInternalDto> responseList = reservationPage.getContent().stream()
-        .map(this::toResponse)
+        .map(ReservationMapper::toResponse)
         .collect(Collectors.toList());
-
     return new PageImpl<>(responseList, reservationPage.getPageable(), responseList.size());
   }
 }
