@@ -3,9 +3,10 @@ package com.fourirbnb.reservation.application.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+import com.fourirbnb.reservation.ReservationApplication;
 import com.fourirbnb.reservation.application.dto.CreateReservationInternalDto;
 import com.fourirbnb.reservation.application.dto.ReservationResponseInternalDto;
-import com.fourirbnb.reservation.domain.model.Reservation;
+import com.fourirbnb.reservation.application.dto.UpdateReservationInternalDto;
 import com.fourirbnb.reservation.domain.repository.ReservationRepository;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -23,7 +24,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@SpringBootTest
+@SpringBootTest(classes = ReservationApplication.class)
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
 @Slf4j
@@ -39,48 +40,23 @@ class ReservationServiceTest {
 
   private final UUID lodgeId2 = UUID.randomUUID();
 
+  private UUID reservationId;
+
   @BeforeEach
   void setUp() {
 
     reservationRepository.deleteAll();
 
-    int day = 1;
+    LocalDateTime checkInDate = LocalDateTime.of(2025, 1, 1, 15, 0, 0);
+    LocalDateTime checkOutDate = LocalDateTime.of(2025, 1, 3, 11, 0, 0);
 
-    for (int i = 0; i < 10; i++) {
+    CreateReservationInternalDto request = new CreateReservationInternalDto(
+        1L, lodgeId1, 300_000L, checkInDate, checkOutDate
+    );
 
-      Long userId = 1L;
+    ReservationResponseInternalDto response = reservationService.createReservation(request);
 
-      LocalDateTime checkInDate = LocalDateTime.of(2025, 1, day++, 15, 0, 0);
-      LocalDateTime checkOutDate = LocalDateTime.of(2025, 1, day, 11, 0, 0);
-
-      if (i >= 5) {
-        userId++;
-      }
-
-      CreateReservationInternalDto reservation = new CreateReservationInternalDto(
-          userId, lodgeId1, 300_000L, checkInDate, checkOutDate
-      );
-
-      reservationService.createReservation(reservation);
-    }
-
-    for (int i = 0; i < 10; i++) {
-
-      Long userId = 1L;
-
-      LocalDateTime checkInDate = LocalDateTime.of(2025, 1, day++, 15, 0, 0);
-      LocalDateTime checkOutDate = LocalDateTime.of(2025, 1, day, 11, 0, 0);
-
-      if (i >= 5) {
-        userId++;
-      }
-
-      CreateReservationInternalDto reservation = new CreateReservationInternalDto(
-          userId, lodgeId2, 300_000L, checkInDate, checkOutDate
-      );
-
-      reservationService.createReservation(reservation);
-    }
+    reservationId = response.id();
   }
 
   @Test
@@ -153,19 +129,30 @@ class ReservationServiceTest {
   @DisplayName("예약 단건 조회 테스트")
   @Order(5)
   void getReservationById() {
-    LocalDateTime checkInDate = LocalDateTime.of(2025, 4, 13, 15, 0, 0);
-    LocalDateTime checkOutDate = LocalDateTime.of(2025, 4, 16, 11, 0, 0);
 
-    CreateReservationInternalDto request = new CreateReservationInternalDto(
-        1L, lodgeId2, 200_000L, checkInDate, checkOutDate
+    log.info("Reservation Id : {}", reservationId);
+
+    ReservationResponseInternalDto findReservation = reservationService
+        .getReservationById(reservationId);
+
+    assertEquals(reservationId, findReservation.id());
+  }
+
+  @Test
+  @DisplayName("예약 상태 변경 테스트")
+  @Order(6)
+  void updateReservationStatus() {
+
+    UpdateReservationInternalDto request = new UpdateReservationInternalDto(
+        "COMPLETED"
     );
 
-    ReservationResponseInternalDto response = reservationService.createReservation(request);
+    ReservationResponseInternalDto response = reservationService
+        .updateReservationStatus(reservationId, request);
 
-    log.info("Reservation Id : {}", response.id());
+    log.info("Updated Reservation Status : {}", response.reservationStatus());
 
-    ReservationResponseInternalDto findReservation = reservationService.getReservationById(response.id());
-
-    assertEquals(response.id(), findReservation.id());
+    assertEquals(reservationId, response.id());
+    assertEquals(request.reservationStatus(), response.reservationStatus());
   }
 }

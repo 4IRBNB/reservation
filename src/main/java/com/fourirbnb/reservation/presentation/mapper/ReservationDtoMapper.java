@@ -22,7 +22,7 @@ public class ReservationDtoMapper {
     );
   }
 
-  public UpdateReservationInternalDto toUpdateInternalDto(UpdateReservationDto request) {
+  public static UpdateReservationInternalDto toUpdateInternalDto(UpdateReservationDto request) {
     return new UpdateReservationInternalDto(
         request.reservationStatus()
     );

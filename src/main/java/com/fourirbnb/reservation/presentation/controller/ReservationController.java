@@ -7,6 +7,7 @@ import com.fourirbnb.reservation.application.dto.ReservationResponseInternalDto;
 import com.fourirbnb.reservation.application.service.ReservationService;
 import com.fourirbnb.reservation.presentation.dto.CreateReservationDto;
 import com.fourirbnb.reservation.presentation.dto.ReservationResponseDto;
+import com.fourirbnb.reservation.presentation.dto.UpdateReservationDto;
 import com.fourirbnb.reservation.presentation.mapper.ReservationDtoMapper;
 import java.util.List;
 import java.util.UUID;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -109,7 +111,20 @@ public class ReservationController {
 
     return BaseResponse.SUCCESS(
         ReservationDtoMapper.toResponse(response),
-        "예약 조회 성공 : "+reservationId, HttpStatus.OK.value()
+        "예약 조회 성공 : " + reservationId, HttpStatus.OK.value()
+    );
+  }
+
+  @PatchMapping("/{reservationId}")
+  public BaseResponse<ReservationResponseDto> updateReservationStatus(
+      @PathVariable UUID reservationId, @RequestBody UpdateReservationDto request) {
+
+    ReservationResponseInternalDto response = reservationService
+        .updateReservationStatus(reservationId, ReservationDtoMapper.toUpdateInternalDto(request));
+
+    return BaseResponse.SUCCESS(
+        ReservationDtoMapper.toResponse(response),
+        "예약 상태 수정 성공 : " + response.reservationStatus(), HttpStatus.OK.value()
     );
   }
 }
