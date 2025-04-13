@@ -1,8 +1,21 @@
 package com.fourirbnb.reservation.presentation.controller;
 
+import com.fourirbnb.common.response.BaseResponse;
+import com.fourirbnb.common.response.Pagination;
+import com.fourirbnb.reservation.application.dto.ReservationResponseInternalDto;
 import com.fourirbnb.reservation.application.service.ReservationService;
+import com.fourirbnb.reservation.presentation.dto.ReservationResponseDto;
+import com.fourirbnb.reservation.presentation.mapper.ReservationDtoMapper;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -12,4 +25,54 @@ public class ReservationInternalController {
 
   private final ReservationService reservationService;
 
+  @GetMapping("/me")
+  public BaseResponse<List<ReservationResponseDto>> getMyReservations(
+      @RequestParam Long userId, Pageable pageable) {
+
+    Page<ReservationResponseInternalDto> responsePage = reservationService
+        .getMyReservations(userId, pageable);
+
+    Pagination pagination = new Pagination(
+        responsePage.getTotalPages(),
+        responsePage.getTotalElements(),
+        responsePage.getNumber(),
+        responsePage.getNumberOfElements()
+    );
+
+    return BaseResponse.SUCCESS(
+        ReservationDtoMapper.toResponseList(responsePage.getContent()),
+        "나의 예약 목록 조회 성공", pagination
+    );
+  }
+
+  @GetMapping("/lodge")
+  public BaseResponse<List<ReservationResponseDto>> getLodgeReservations(
+      @RequestParam UUID lodgeId, Pageable pageable) {
+
+    Page<ReservationResponseInternalDto> responsePage = reservationService
+        .getLodgeReservations(lodgeId, pageable);
+
+    Pagination pagination = new Pagination(
+        responsePage.getTotalPages(),
+        responsePage.getTotalElements(),
+        responsePage.getNumber(),
+        responsePage.getNumberOfElements()
+    );
+
+    return BaseResponse.SUCCESS(
+        ReservationDtoMapper.toResponseList(responsePage.getContent()),
+        "숙소의 예약 목록 조회 성공", pagination
+    );
+  }
+
+  @GetMapping("/{reservationId}")
+  public BaseResponse<ReservationResponseDto> getReservationById(@PathVariable UUID reservationId) {
+
+    ReservationResponseInternalDto response = reservationService.getReservationById(reservationId);
+
+    return BaseResponse.SUCCESS(
+        ReservationDtoMapper.toResponse(response),
+        "예약 조회 성공 : " + reservationId, HttpStatus.OK.value()
+    );
+  }
 }

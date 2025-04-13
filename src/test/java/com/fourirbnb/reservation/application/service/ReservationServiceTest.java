@@ -1,35 +1,91 @@
 package com.fourirbnb.reservation.application.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import com.fourirbnb.reservation.application.dto.CreateReservationInternalDto;
 import com.fourirbnb.reservation.application.dto.ReservationResponseInternalDto;
+import com.fourirbnb.reservation.domain.model.Reservation;
 import com.fourirbnb.reservation.domain.repository.ReservationRepository;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
+@ActiveProfiles("test")
 @Slf4j
 class ReservationServiceTest {
 
   @Autowired
   private ReservationService reservationService;
 
-  @MockitoBean
+  @Autowired
   private ReservationRepository reservationRepository;
 
+  private final UUID lodgeId1 = UUID.randomUUID();
+
+  private final UUID lodgeId2 = UUID.randomUUID();
+
+  @BeforeEach
+  void setUp() {
+
+    reservationRepository.deleteAll();
+
+    int day = 1;
+
+    for (int i = 0; i < 10; i++) {
+
+      Long userId = 1L;
+
+      LocalDateTime checkInDate = LocalDateTime.of(2025, 1, day++, 15, 0, 0);
+      LocalDateTime checkOutDate = LocalDateTime.of(2025, 1, day, 11, 0, 0);
+
+      if (i >= 5) {
+        userId++;
+      }
+
+      CreateReservationInternalDto reservation = new CreateReservationInternalDto(
+          userId, lodgeId1, 300_000L, checkInDate, checkOutDate
+      );
+
+      reservationService.createReservation(reservation);
+    }
+
+    for (int i = 0; i < 10; i++) {
+
+      Long userId = 1L;
+
+      LocalDateTime checkInDate = LocalDateTime.of(2025, 1, day++, 15, 0, 0);
+      LocalDateTime checkOutDate = LocalDateTime.of(2025, 1, day, 11, 0, 0);
+
+      if (i >= 5) {
+        userId++;
+      }
+
+      CreateReservationInternalDto reservation = new CreateReservationInternalDto(
+          userId, lodgeId2, 300_000L, checkInDate, checkOutDate
+      );
+
+      reservationService.createReservation(reservation);
+    }
+  }
 
   @Test
   @DisplayName("예약 생성 테스트")
+  @Order(1)
   void createReservation() {
     LocalDateTime checkInDate = LocalDateTime.of(2025, 4, 12, 15, 0, 0);
     LocalDateTime checkOutDate = LocalDateTime.of(2025, 4, 14, 11, 0, 0);
@@ -45,4 +101,71 @@ class ReservationServiceTest {
     assertEquals(1L, response.userId());
   }
 
+  @Test
+  @DisplayName("예약 전체 목록 조회 테스트")
+  @Order(2)
+  void getReservations() {
+
+    Pageable pageable = PageRequest.of(0, 10);
+    Page<ReservationResponseInternalDto> reservations = reservationService
+        .getReservations(pageable);
+
+    log.info("Reservation Size : {}", reservations.getContent().size());
+
+    assertEquals(10, reservations.getContent().size());
+  }
+
+  @Test
+  @DisplayName("나의 예약 목록 조회 테스트")
+  @Order(3)
+  void getMyReservations() {
+
+    Long userId = 1L;
+
+    Pageable pageable = PageRequest.of(0, 10);
+
+    Page<ReservationResponseInternalDto> reservations = reservationService
+        .getMyReservations(userId, pageable);
+
+    log.info("User Id : {}", userId);
+
+    assertEquals(userId, reservations.getContent().get(1).userId());
+  }
+
+  @Test
+  @DisplayName("숙소의 예약 목록 조회 테스트")
+  @Order(4)
+  void getLodgeReservations() {
+
+    Pageable pageable = PageRequest.of(0, 10);
+
+    Page<ReservationResponseInternalDto> reservations = reservationService
+        .getLodgeReservations(lodgeId1, pageable);
+
+    log.info("Lodge1 Id : {}", lodgeId1);
+    log.info("Lodge2 Id : {}", lodgeId2);
+
+    assertEquals(lodgeId1, reservations.getContent().get(1).lodeId());
+    assertNotEquals(lodgeId2, reservations.getContent().get(2).lodeId());
+  }
+
+  @Test
+  @DisplayName("예약 단건 조회 테스트")
+  @Order(5)
+  void getReservationById() {
+    LocalDateTime checkInDate = LocalDateTime.of(2025, 4, 13, 15, 0, 0);
+    LocalDateTime checkOutDate = LocalDateTime.of(2025, 4, 16, 11, 0, 0);
+
+    CreateReservationInternalDto request = new CreateReservationInternalDto(
+        1L, lodgeId2, 200_000L, checkInDate, checkOutDate
+    );
+
+    ReservationResponseInternalDto response = reservationService.createReservation(request);
+
+    log.info("Reservation Id : {}", response.id());
+
+    ReservationResponseInternalDto findReservation = reservationService.getReservationById(response.id());
+
+    assertEquals(response.id(), findReservation.id());
+  }
 }
