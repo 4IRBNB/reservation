@@ -1,4 +1,4 @@
-package com.fourirbnb.reservation.infrastructure.config;
+package com.fourirbnb.reservation.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;

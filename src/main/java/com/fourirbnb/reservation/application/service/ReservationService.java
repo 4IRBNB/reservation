@@ -96,4 +96,15 @@ public class ReservationService {
 
     return ReservationMapper.toResponse(reservation);
   }
+
+  @Transactional
+  public ReservationResponseInternalDto deleteReservation(UUID reservationId) {
+
+    Reservation reservation = reservationRepository.findById(reservationId)
+        .orElseThrow(() -> new ResourceNotFoundException("예약 삭제 실패 : 예약이 존재하지 않음"));
+
+    reservationRepository.deleteById(reservationId);
+
+    return ReservationMapper.toResponse(reservation);
+  }
 }

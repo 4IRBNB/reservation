@@ -41,6 +41,11 @@ public class ReservationRepositoryImpl implements ReservationRepository {
   }
 
   @Override
+  public void deleteById(UUID reservationId) {
+    jpaRepository.deleteById(reservationId);
+  }
+
+  @Override
   public void deleteAll() {
     jpaRepository.deleteAll();
   }

@@ -2,15 +2,20 @@ package com.fourirbnb.reservation.application.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.fourirbnb.common.exception.ResourceNotFoundException;
 import com.fourirbnb.reservation.ReservationApplication;
 import com.fourirbnb.reservation.application.dto.CreateReservationInternalDto;
 import com.fourirbnb.reservation.application.dto.ReservationResponseInternalDto;
 import com.fourirbnb.reservation.application.dto.UpdateReservationInternalDto;
 import com.fourirbnb.reservation.domain.repository.ReservationRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Session;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
@@ -23,12 +28,17 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest(classes = ReservationApplication.class)
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
 @Slf4j
+@Transactional
 class ReservationServiceTest {
+
+  @PersistenceContext
+  private EntityManager entityManager;
 
   @Autowired
   private ReservationService reservationService;
@@ -44,6 +54,9 @@ class ReservationServiceTest {
 
   @BeforeEach
   void setUp() {
+
+    entityManager.unwrap(Session.class)
+        .enableFilter("deletedFilter");
 
     reservationRepository.deleteAll();
 
@@ -154,5 +167,18 @@ class ReservationServiceTest {
 
     assertEquals(reservationId, response.id());
     assertEquals(request.reservationStatus(), response.reservationStatus());
+  }
+
+  @Test
+  @DisplayName("예약 삭제 테스트 : Soft Delete")
+  @Order(6)
+  void deleteReservation() {
+
+    ReservationResponseInternalDto reservation =
+        reservationService.deleteReservation(reservationId);
+
+    assertThrows(ResourceNotFoundException.class, () -> {
+      reservationService.getReservationById(reservationId);
+    });
   }
 }

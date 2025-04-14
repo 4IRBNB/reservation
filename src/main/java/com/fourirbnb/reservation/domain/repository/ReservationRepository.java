@@ -19,4 +19,6 @@ public interface ReservationRepository {
   void deleteAll();
 
   Optional<Reservation> findById(UUID reservationId);
+
+  void deleteById(UUID reservationId);
 }
