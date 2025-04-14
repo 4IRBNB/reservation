@@ -51,4 +51,8 @@ public class Reservation extends BaseEntity {
     this.checkOutDate = checkOutDate;
     this.reservationStatus = reservationStatus;
   }
+
+  public void update(ReservationStatus reservationStatus) {
+    this.reservationStatus = reservationStatus;
+  }
 }
