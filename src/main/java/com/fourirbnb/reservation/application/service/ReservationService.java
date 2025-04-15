@@ -107,8 +107,7 @@ public class ReservationService {
     return ReservationMapper.toResponse(reservation);
   }
 
-  @Transactional(readOnly = true)
-  protected Reservation findReservationById(UUID reservationId) {
+  private Reservation findReservationById(UUID reservationId) {
 
     return reservationRepository.findById(reservationId)
         .orElseThrow(() -> new ResourceNotFoundException("예약 조회 실패 : 예약이 존재하지 않음"));
