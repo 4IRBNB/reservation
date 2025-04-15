@@ -46,7 +46,7 @@ public class ReservationService {
           paymentPort.createPayment(reservation.getId(), reservation.getPrice(), false)
       );
 
-      reservation.complete();
+      reservation.reserve();
       reservationRepository.save(reservation);
     } catch (Exception e) {
 

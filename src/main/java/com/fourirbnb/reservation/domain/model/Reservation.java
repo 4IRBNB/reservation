@@ -63,6 +63,10 @@ public class Reservation extends BaseEntity {
     this.reservationStatus = ReservationStatus.PENDING;
   }
 
+  public void reserve() {
+    this.reservationStatus = ReservationStatus.RESERVED;
+  }
+
   public void complete() {
     this.reservationStatus = ReservationStatus.COMPLETED;
   }
