@@ -7,9 +7,10 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ReservationStatus {
 
+  PENDING("PENDING"),
   RESERVED("RESERVED"),
   CANCELLED("CANCELLED"),
   COMPLETED("COMPLETED");
 
-  private final String description;
+  private final String status;
 }

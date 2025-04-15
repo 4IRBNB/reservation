@@ -45,18 +45,33 @@ public class Reservation extends BaseEntity {
   @Column(nullable = false)
   private ReservationStatus reservationStatus;
 
-  public Reservation(Long userId, UUID lodgeId, Long price, LocalDateTime checkInDate,
-      LocalDateTime checkOutDate, ReservationStatus reservationStatus) {
+  public Reservation(Long userId, UUID lodgeId, Long price,
+      LocalDateTime checkInDate, LocalDateTime checkOutDate) {
 
     this.userId = userId;
     this.lodgeId = lodgeId;
     this.price = price;
     this.checkInDate = checkInDate;
     this.checkOutDate = checkOutDate;
-    this.reservationStatus = reservationStatus;
   }
 
   public void update(ReservationStatus reservationStatus) {
     this.reservationStatus = reservationStatus;
+  }
+
+  public void pending() {
+    this.reservationStatus = ReservationStatus.PENDING;
+  }
+
+  public void reserve() {
+    this.reservationStatus = ReservationStatus.RESERVED;
+  }
+
+  public void complete() {
+    this.reservationStatus = ReservationStatus.COMPLETED;
+  }
+
+  public void cancel() {
+    this.reservationStatus = ReservationStatus.CANCELLED;
   }
 }

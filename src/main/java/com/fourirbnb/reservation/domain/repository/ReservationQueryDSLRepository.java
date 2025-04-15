@@ -5,6 +5,5 @@ import java.util.UUID;
 
 public interface ReservationQueryDSLRepository {
 
-  boolean existsByLodgeIdAndPeriodOverlap(UUID lodgeId, LocalDateTime checkInDate,
-      LocalDateTime checkOutDate);
+  boolean existsReservation(UUID lodgeId, LocalDateTime checkInDate, LocalDateTime checkOutDate);
 }

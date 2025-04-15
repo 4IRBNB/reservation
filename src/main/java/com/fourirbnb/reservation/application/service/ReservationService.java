@@ -1,12 +1,15 @@
 package com.fourirbnb.reservation.application.service;
 
+import com.fourirbnb.common.exception.InternalServerException;
 import com.fourirbnb.common.exception.ResourceNotFoundException;
 import com.fourirbnb.reservation.application.dto.CreateReservationInternalDto;
 import com.fourirbnb.reservation.application.dto.ReservationResponseInternalDto;
 import com.fourirbnb.reservation.application.dto.UpdateReservationInternalDto;
 import com.fourirbnb.reservation.application.mapper.ReservationMapper;
+import com.fourirbnb.reservation.domain.model.PaymentData;
 import com.fourirbnb.reservation.domain.model.Reservation;
 import com.fourirbnb.reservation.domain.model.ReservationStatus;
+import com.fourirbnb.reservation.domain.port.PaymentPort;
 import com.fourirbnb.reservation.domain.repository.ReservationRepository;
 import com.fourirbnb.reservation.domain.service.ReservationDomainService;
 import java.util.UUID;
@@ -24,15 +27,34 @@ public class ReservationService {
 
   private final ReservationDomainService reservationDomainService;
 
+  private final PaymentPort paymentPort;
+
   @Transactional
   public ReservationResponseInternalDto createReservation(
       CreateReservationInternalDto internalDto) {
 
     Reservation reservation = ReservationMapper.toEntity(internalDto);
 
+    reservation.pending();
+
     reservationDomainService.validateLodgeAvailable(reservation);
 
     reservationRepository.save(reservation);
+
+    try {
+      PaymentData data = paymentPort.toDomainModel(
+          paymentPort.createPayment(reservation.getId(), reservation.getPrice(), false)
+      );
+
+      reservation.reserve();
+      reservationRepository.save(reservation);
+    } catch (Exception e) {
+
+      reservation.cancel();
+      reservationRepository.save(reservation);
+
+      throw new InternalServerException(e.getMessage());
+    }
 
     return ReservationMapper.toResponse(reservation);
   }

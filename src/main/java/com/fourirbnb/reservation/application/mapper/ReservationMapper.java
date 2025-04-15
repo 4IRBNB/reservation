@@ -17,8 +17,7 @@ public class ReservationMapper {
         request.lodgeId(),
         request.price(),
         request.checkInDate(),
-        request.checkOutDate(),
-        ReservationStatus.RESERVED
+        request.checkOutDate()
     );
   }
 
@@ -30,7 +29,7 @@ public class ReservationMapper {
         reservation.getPrice(),
         reservation.getCheckInDate(),
         reservation.getCheckOutDate(),
-        reservation.getReservationStatus().getDescription()
+        reservation.getReservationStatus().getStatus()
     );
   }
 
