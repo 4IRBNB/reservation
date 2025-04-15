@@ -177,6 +177,8 @@ class ReservationServiceTest {
     ReservationResponseInternalDto reservation =
         reservationService.deleteReservation(reservationId);
 
+    entityManager.clear();
+
     assertThrows(ResourceNotFoundException.class, () -> {
       reservationService.getReservationById(reservationId);
     });

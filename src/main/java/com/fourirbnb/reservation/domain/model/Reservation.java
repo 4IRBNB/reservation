@@ -13,13 +13,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
-import org.hibernate.annotations.ParamDef;
-import org.hibernate.annotations.SQLDelete;
 
 @Getter
 @NoArgsConstructor
 @Entity
-@SQLDelete(sql = "UPDATE p_reservation SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
 @FilterDef(name = "deletedFilter")
 @Filter(name = "deletedFilter", condition = "deleted_at IS NULL")
 @Table(name = "p_reservation")

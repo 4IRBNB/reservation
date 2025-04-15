@@ -34,7 +34,7 @@ repositories {
 dependencies {
 
     // 공통 모듈
-    implementation 'com.fourirbnb:common:1.2.3'
+    implementation 'com.fourirbnb:common:1.2.4'
     // Spring Boot Starter
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
