@@ -1,6 +1,7 @@
 package com.fourirbnb.reservation.infrastructure.repository;
 
 import com.fourirbnb.reservation.domain.model.QReservation;
+import com.fourirbnb.reservation.domain.model.ReservationStatus;
 import com.fourirbnb.reservation.domain.repository.ReservationQueryDSLRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDateTime;
@@ -15,8 +16,8 @@ public class ReservationQueryDSLRepositoryImpl implements ReservationQueryDSLRep
   private final JPAQueryFactory queryFactory;
 
   @Override
-  public boolean existsByLodgeIdAndPeriodOverlap(UUID lodgeId, LocalDateTime checkInDate,
-      LocalDateTime checkOutDate) {
+  public boolean existsReservation(UUID lodgeId,
+      LocalDateTime checkInDate, LocalDateTime checkOutDate) {
 
     QReservation reservation = QReservation.reservation;
 
@@ -24,6 +25,7 @@ public class ReservationQueryDSLRepositoryImpl implements ReservationQueryDSLRep
         .from(reservation)
         .where(
             reservation.lodgeId.eq(lodgeId),
+            reservation.reservationStatus.eq(ReservationStatus.RESERVED),
             reservation.checkInDate.lt(checkOutDate),
             reservation.checkOutDate.gt(checkInDate)
         )
