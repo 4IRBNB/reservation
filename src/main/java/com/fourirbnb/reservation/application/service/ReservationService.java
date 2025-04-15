@@ -77,8 +77,7 @@ public class ReservationService {
   @Transactional(readOnly = true)
   public ReservationResponseInternalDto getReservationById(UUID reservationId) {
 
-    Reservation reservation = reservationRepository.findById(reservationId)
-        .orElseThrow(() -> new ResourceNotFoundException("예약 조회 실패 : 예약이 존재하지 않음"));
+    Reservation reservation = findReservationById(reservationId);
 
     return ReservationMapper.toResponse(reservation);
   }
@@ -87,8 +86,7 @@ public class ReservationService {
   public ReservationResponseInternalDto updateReservationStatus(
       UUID reservationId, UpdateReservationInternalDto request) {
 
-    Reservation reservation = reservationRepository.findById(reservationId)
-        .orElseThrow(() -> new ResourceNotFoundException("예약 수정 실패 : 예약이 존재하지 않음"));
+    Reservation reservation = findReservationById(reservationId);
 
     reservation.update(ReservationStatus.valueOf(request.reservationStatus()));
 
@@ -100,11 +98,18 @@ public class ReservationService {
   @Transactional
   public ReservationResponseInternalDto deleteReservation(UUID reservationId) {
 
-    Reservation reservation = reservationRepository.findById(reservationId)
-        .orElseThrow(() -> new ResourceNotFoundException("예약 삭제 실패 : 예약이 존재하지 않음"));
+    Reservation reservation = findReservationById(reservationId);
 
-    reservationRepository.deleteById(reservationId);
+    reservation.delete(1L);
+
+    reservationRepository.save(reservation);
 
     return ReservationMapper.toResponse(reservation);
+  }
+
+  private Reservation findReservationById(UUID reservationId) {
+
+    return reservationRepository.findById(reservationId)
+        .orElseThrow(() -> new ResourceNotFoundException("예약 조회 실패 : 예약이 존재하지 않음"));
   }
 }
