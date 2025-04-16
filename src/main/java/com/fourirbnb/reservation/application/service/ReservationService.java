@@ -129,6 +129,20 @@ public class ReservationService {
 
     reservationRepository.save(reservation);
 
+    try {
+
+      NotificationData notification = notificationPort.toDomainModel(
+          notificationPort.createNotification(
+              reservation.getId(), reservation.getUserId(), reservation.getLodgeId(),
+              reservation.getCheckInDate(), reservation.getCheckOutDate(),
+              reservation.getReservationStatus().getStatus()
+          )
+      );
+    } catch (Exception e) {
+
+      throw new InternalServerException(e.getMessage());
+    }
+
     return ReservationMapper.toResponse(reservation);
   }
 
