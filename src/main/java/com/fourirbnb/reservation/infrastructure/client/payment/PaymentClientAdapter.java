@@ -1,10 +1,10 @@
-package com.fourirbnb.reservation.infrastructure.client;
+package com.fourirbnb.reservation.infrastructure.client.payment;
 
 import com.fourirbnb.common.response.BaseResponse;
 import com.fourirbnb.reservation.domain.model.PaymentData;
 import com.fourirbnb.reservation.domain.port.PaymentPort;
-import com.fourirbnb.reservation.infrastructure.client.dto.CreatePaymentRequestDto;
-import com.fourirbnb.reservation.infrastructure.client.dto.PaymentResponseDto;
+import com.fourirbnb.reservation.infrastructure.client.payment.dto.CreatePaymentRequestDto;
+import com.fourirbnb.reservation.infrastructure.client.payment.dto.PaymentResponseDto;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

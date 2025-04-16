@@ -1,4 +1,4 @@
-package com.fourirbnb.reservation.infrastructure.client.dto;
+package com.fourirbnb.reservation.infrastructure.client.payment.dto;
 
 import java.util.UUID;
 

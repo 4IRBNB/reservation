@@ -6,9 +6,11 @@ import com.fourirbnb.reservation.application.dto.CreateReservationInternalDto;
 import com.fourirbnb.reservation.application.dto.ReservationResponseInternalDto;
 import com.fourirbnb.reservation.application.dto.UpdateReservationInternalDto;
 import com.fourirbnb.reservation.application.mapper.ReservationMapper;
+import com.fourirbnb.reservation.domain.model.NotificationData;
 import com.fourirbnb.reservation.domain.model.PaymentData;
 import com.fourirbnb.reservation.domain.model.Reservation;
 import com.fourirbnb.reservation.domain.model.ReservationStatus;
+import com.fourirbnb.reservation.domain.port.NotificationPort;
 import com.fourirbnb.reservation.domain.port.PaymentPort;
 import com.fourirbnb.reservation.domain.repository.ReservationRepository;
 import com.fourirbnb.reservation.domain.service.ReservationDomainService;
@@ -24,10 +26,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReservationService {
 
   private final ReservationRepository reservationRepository;
-
   private final ReservationDomainService reservationDomainService;
-
   private final PaymentPort paymentPort;
+  private final NotificationPort notificationPort;
 
   @Transactional
   public ReservationResponseInternalDto createReservation(
@@ -42,7 +43,7 @@ public class ReservationService {
     reservationRepository.save(reservation);
 
     try {
-      PaymentData data = paymentPort.toDomainModel(
+      PaymentData payment = paymentPort.toDomainModel(
           paymentPort.createPayment(reservation.getId(), reservation.getPrice(), false)
       );
 
@@ -52,6 +53,20 @@ public class ReservationService {
 
       reservation.cancel();
       reservationRepository.save(reservation);
+
+      throw new InternalServerException(e.getMessage());
+    }
+
+    try {
+
+      NotificationData notification = notificationPort.toDomainModel(
+          notificationPort.createNotification(
+              reservation.getId(), reservation.getUserId(), reservation.getLodgeId(),
+              reservation.getCheckInDate(), reservation.getCheckOutDate(),
+              reservation.getReservationStatus().getStatus()
+          )
+      );
+    } catch (Exception e) {
 
       throw new InternalServerException(e.getMessage());
     }
@@ -113,6 +128,20 @@ public class ReservationService {
     reservation.update(ReservationStatus.valueOf(request.reservationStatus()));
 
     reservationRepository.save(reservation);
+
+    try {
+
+      NotificationData notification = notificationPort.toDomainModel(
+          notificationPort.createNotification(
+              reservation.getId(), reservation.getUserId(), reservation.getLodgeId(),
+              reservation.getCheckInDate(), reservation.getCheckOutDate(),
+              reservation.getReservationStatus().getStatus()
+          )
+      );
+    } catch (Exception e) {
+
+      throw new InternalServerException(e.getMessage());
+    }
 
     return ReservationMapper.toResponse(reservation);
   }
