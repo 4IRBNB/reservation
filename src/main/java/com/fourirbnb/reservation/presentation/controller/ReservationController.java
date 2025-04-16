@@ -2,6 +2,8 @@ package com.fourirbnb.reservation.presentation.controller;
 
 import com.fourirbnb.common.response.BaseResponse;
 import com.fourirbnb.common.response.Pagination;
+import com.fourirbnb.common.security.AuthenticatedUser;
+import com.fourirbnb.common.security.UserInfo;
 import com.fourirbnb.reservation.application.dto.CreateReservationInternalDto;
 import com.fourirbnb.reservation.application.dto.ReservationResponseInternalDto;
 import com.fourirbnb.reservation.application.service.ReservationService;

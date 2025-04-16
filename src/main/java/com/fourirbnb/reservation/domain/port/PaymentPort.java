@@ -3,7 +3,7 @@ package com.fourirbnb.reservation.domain.port;
 
 import com.fourirbnb.common.response.BaseResponse;
 import com.fourirbnb.reservation.domain.model.PaymentData;
-import com.fourirbnb.reservation.infrastructure.client.dto.PaymentResponseDto;
+import com.fourirbnb.reservation.infrastructure.client.payment.dto.PaymentResponseDto;
 import java.util.UUID;
 
 public interface PaymentPort {

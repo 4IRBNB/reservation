@@ -1,8 +1,8 @@
-package com.fourirbnb.reservation.infrastructure.client;
+package com.fourirbnb.reservation.infrastructure.client.payment;
 
 import com.fourirbnb.common.response.BaseResponse;
-import com.fourirbnb.reservation.infrastructure.client.dto.CreatePaymentRequestDto;
-import com.fourirbnb.reservation.infrastructure.client.dto.PaymentResponseDto;
+import com.fourirbnb.reservation.infrastructure.client.payment.dto.CreatePaymentRequestDto;
+import com.fourirbnb.reservation.infrastructure.client.payment.dto.PaymentResponseDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
