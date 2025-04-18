@@ -1,5 +1,6 @@
 package com.fourirbnb.reservation.infrastructure.client.notification;
 
+import com.fourirbnb.common.FeignInterceptor.NoAuthFeignClient;
 import com.fourirbnb.common.response.BaseResponse;
 import com.fourirbnb.reservation.infrastructure.client.notification.dto.CreateNotificationRequestDto;
 import com.fourirbnb.reservation.infrastructure.client.notification.dto.NotificationResponseDto;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @FeignClient(name = "notification", url = "http://localhost:19098")
+@NoAuthFeignClient
 public interface NotificationClient {
 
   @PostMapping("/internal/notifications")

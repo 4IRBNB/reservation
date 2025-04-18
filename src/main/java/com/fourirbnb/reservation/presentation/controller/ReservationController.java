@@ -6,6 +6,7 @@ import com.fourirbnb.common.security.AuthenticatedUser;
 import com.fourirbnb.common.security.UserInfo;
 import com.fourirbnb.reservation.application.dto.CreateReservationInternalDto;
 import com.fourirbnb.reservation.application.dto.ReservationResponseInternalDto;
+import com.fourirbnb.reservation.application.service.ReservationFacade;
 import com.fourirbnb.reservation.application.service.ReservationService;
 import com.fourirbnb.reservation.presentation.dto.CreateReservationDto;
 import com.fourirbnb.reservation.presentation.dto.ReservationResponseDto;
@@ -33,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReservationController {
 
   private final ReservationService reservationService;
+  private final ReservationFacade reservationFacade;
 
   @PostMapping("")
   public BaseResponse<ReservationResponseDto> createReservation(
@@ -40,7 +42,7 @@ public class ReservationController {
 
     CreateReservationInternalDto internalDto = ReservationDtoMapper.toCreateInternalDto(request);
 
-    ReservationResponseInternalDto response = reservationService.createReservation(internalDto);
+    ReservationResponseInternalDto response = reservationFacade.createReservation(internalDto);
 
     return BaseResponse.SUCCESS(
         ReservationDtoMapper.toResponse(response),
@@ -122,7 +124,7 @@ public class ReservationController {
   public BaseResponse<ReservationResponseDto> updateReservationStatus(
       @PathVariable UUID reservationId, @RequestBody UpdateReservationDto request) {
 
-    ReservationResponseInternalDto response = reservationService
+    ReservationResponseInternalDto response = reservationFacade
         .updateReservationStatus(reservationId, ReservationDtoMapper.toUpdateInternalDto(request));
 
     return BaseResponse.SUCCESS(
