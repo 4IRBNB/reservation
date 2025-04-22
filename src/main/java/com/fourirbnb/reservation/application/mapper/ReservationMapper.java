@@ -17,7 +17,8 @@ public class ReservationMapper {
         request.lodgeId(),
         request.price(),
         request.checkInDate(),
-        request.checkOutDate()
+        request.checkOutDate(),
+        ReservationStatus.PENDING
     );
   }
 

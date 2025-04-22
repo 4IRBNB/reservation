@@ -3,6 +3,8 @@ package com.fourirbnb.reservation.domain.model;
 import com.fourirbnb.common.domain.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -43,16 +45,18 @@ public class Reservation extends BaseEntity {
   private LocalDateTime checkOutDate;
 
   @Column(nullable = false)
+  @Enumerated(value = EnumType.STRING)
   private ReservationStatus reservationStatus;
 
   public Reservation(Long userId, UUID lodgeId, Long price,
-      LocalDateTime checkInDate, LocalDateTime checkOutDate) {
+      LocalDateTime checkInDate, LocalDateTime checkOutDate, ReservationStatus status) {
 
     this.userId = userId;
     this.lodgeId = lodgeId;
     this.price = price;
     this.checkInDate = checkInDate;
     this.checkOutDate = checkOutDate;
+    this.reservationStatus = status;
   }
 
   public void update(ReservationStatus reservationStatus) {

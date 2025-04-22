@@ -33,7 +33,7 @@ public class ReservationDtoMapper {
     return new ReservationResponseDto(
         response.id(),
         response.userId(),
-        response.lodeId(),
+        response.lodgeId(),
         response.price(),
         response.checkInDate(),
         response.checkOutDate(),

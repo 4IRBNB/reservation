@@ -4,6 +4,7 @@ import com.fourirbnb.reservation.domain.model.QReservation;
 import com.fourirbnb.reservation.domain.model.ReservationStatus;
 import com.fourirbnb.reservation.domain.repository.ReservationQueryDSLRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.LockModeType;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
