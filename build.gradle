@@ -1,4 +1,3 @@
-
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.4.4'
@@ -6,7 +5,7 @@ plugins {
 }
 
 group = 'com.fourirbnb'
-version = '0.0.1-SNAPSHOT'
+version = '1.0.0'
 
 java {
     toolchain {
@@ -65,8 +64,15 @@ dependencies {
     annotationProcessor "jakarta.annotation:jakarta.annotation-api"
     annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
+    // config
+    // implementation 'org.springframework.cloud:spring-cloud-starter-config'
+
+    // Redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
     // FeignClient
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+    // implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'

@@ -11,6 +11,8 @@ import com.fourirbnb.reservation.domain.repository.ReservationRepository;
 import com.fourirbnb.reservation.domain.service.ReservationDomainService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,7 @@ public class ReservationService {
   private final PostgresLockExecutor postgresLockExecutor;
 
   @Transactional
+  @CacheEvict(value = "lodgeReservations", allEntries = true)
   public ReservationResponseInternalDto createReservation(
       CreateReservationInternalDto internalDto) {
 
@@ -68,6 +71,10 @@ public class ReservationService {
   }
 
   @Transactional(readOnly = true)
+  @Cacheable(
+      cacheNames = "reservationCache",
+      key = "'lodge:'+#lodgeId.toString()"
+  )
   public Page<ReservationResponseInternalDto> getLodgeReservations(UUID lodgeId,
       Pageable pageable) {
 
@@ -89,6 +96,7 @@ public class ReservationService {
   }
 
   @Transactional
+  @CacheEvict(value = "lodgeReservations", allEntries = true)
   public ReservationResponseInternalDto updateReservationStatus(
       UUID reservationId, UpdateReservationInternalDto request) {
 
@@ -102,6 +110,7 @@ public class ReservationService {
   }
 
   @Transactional
+  @CacheEvict(value = "lodgeReservations", allEntries = true)
   public ReservationResponseInternalDto deleteReservation(UUID reservationId) {
 
     Reservation reservation = findReservationById(reservationId);
