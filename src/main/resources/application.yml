@@ -28,6 +28,11 @@ spring:
       port: 6379
       username: default
       password: redis1234
+  kafka:
+    bootstrap-servers:
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
 common:
   jpa:

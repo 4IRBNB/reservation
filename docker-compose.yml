@@ -1,10 +1,90 @@
 services:
-  redis-stack:
-    image: redis/redis-stack
-    container_name: redis-stack-compose
-    restart: always
+  postgres:
+    image: postgres:15
+    container_name: 4IRBNB-db
+    restart: unless-stopped
     environment:
-      REDIS_ARGS: "--requirepass redis1234"
+      POSTGRES_DB: 4IRBNB
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: fourirbnb
     ports:
-      - 6379:6379
-      - 8001:8001
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - 4IRBNB-network
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --appendfsync everysec
+    volumes:
+      - redis_data:/data
+    networks:
+      - 4IRBNB-network
+
+  zipkin:
+    image: openzipkin/zipkin:latest
+    container_name: zipkin
+    restart: unless-stopped
+    ports:
+      - "9411:9411"
+    networks:
+      - 4IRBNB-network
+  #    environment:
+  #      - JAVA_OPTS=-XX:UseSVE=0
+  zookeeper:
+    image: zookeeper:3.8.3
+    container_name: 4IRBNB-zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOO_STANDALONE_ENABLED: "true"
+      ZOO_MY_ID: "1"
+      ZOO_SERVERS: "server.1=zookeeper:2888:3888"
+    networks:
+      - 4IRBNB-network
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.1
+    container_name: 4IRBNB-kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - 4IRBNB-network
+    depends_on:
+      - zookeeper
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: 4IRBNB-kafka-ui
+    ports:
+      - "8080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+      KAFKA_CLUSTERS_0_READONLY: "false"
+    networks:
+      - 4IRBNB-network
+    depends_on:
+      - kafka
+      - zookeeper
+networks:
+  4IRBNB-network:
+
+volumes:
+  postgres-data:
+    name: postgres_data
+  redis_data:
+    name: redis_data
