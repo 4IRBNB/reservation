@@ -1,6 +1,6 @@
 spring:
   application:
-    name: reservation-service
+    name: reservation
   profiles:
     active: local
 
@@ -29,10 +29,17 @@ spring:
       username: default
       password: redis1234
   kafka:
-    bootstrap-servers:
+    bootstrap-servers: localhost:9092
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: reservation-group  # reservation 서비스면 reservation-group, payment는 payment-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      auto-offset-reset: earliest
+    listener:
+      ack-mode: record  # record 단위 ack (원하면 MANUAL로 변경 가능)
 
 common:
   jpa:
