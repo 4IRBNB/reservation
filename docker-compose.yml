@@ -1,10 +1,104 @@
+version: '3.7'
+
 services:
-  redis-stack:
-    image: redis/redis-stack
-    container_name: redis-stack-compose
-    restart: always
+  # PostgreSQL
+  postgres:
+    image: postgres:15
+    container_name: reservation-db
+    restart: unless-stopped
     environment:
-      REDIS_ARGS: "--requirepass redis1234"
+      POSTGRES_DB: 4IRBNB
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: fourirbnb
     ports:
-      - 6379:6379
-      - 8001:8001
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - 4IRBNB-network
+
+  # Zipkin (트레이싱 시스템)
+  zipkin:
+    image: openzipkin/zipkin:latest
+    container_name: reservation-zipkin
+    restart: unless-stopped
+    ports:
+      - "9411:9411"
+    networks:
+      - 4IRBNB-network
+
+  # Zookeeper (Kafka의 메타데이터 관리)
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.1
+    container_name: 4IRBNB-zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: "2181"
+      ZOOKEEPER_TICK_TIME: "2000"
+      ZOOKEEPER_SYNC_LIMIT: "5"
+    volumes:
+      - zookeeper_data:/data
+      - zookeeper_datalog:/datalog
+    networks:
+      - 4IRBNB-network
+
+  # Kafka (메시지 브로커)
+  kafka:
+    image: confluentinc/cp-kafka:7.6.1
+    container_name: 4IRBNB-kafka-reservation
+    ports:
+      - "9092:9092"  # 로컬 앱용
+      - "29092:29092"  # Kafka UI 같은 Docker 컨테이너용
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_HOST://kafka:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT_HOST
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - 4IRBNB-network
+    depends_on:
+      - zookeeper
+    command: [ "sh", "-c", "until nc -z zookeeper 2181; do echo waiting for zookeeper; sleep 1; done; /etc/confluent/docker/run" ]
+
+  # Kafka UI (Kafka 관리용 UI)
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: 4IRBNB-kafka-ui-reservation
+    ports:
+      - "8080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092  # 변경된 부분
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+      KAFKA_CLUSTERS_0_READONLY: "false"
+    networks:
+      - 4IRBNB-network
+    depends_on:
+      - kafka
+      - zookeeper
+
+  # Redis (캐시 시스템)
+  redis:
+    image: redis:latest
+    container_name: reservation-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - 4IRBNB-network
+
+networks:
+  4IRBNB-network:
+
+volumes:
+  postgres-data:
+    name: postgres_data
+  zookeeper_data:
+    name: zookeeper_data
+  zookeeper_datalog:
+    name: zookeeper_datalog
