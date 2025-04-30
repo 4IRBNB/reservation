@@ -2,7 +2,7 @@ package com.fourirbnb.reservation.application.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fourirbnb.common.exception.InternalServerException;
-import com.fourirbnb.reservation.application.event.PaymentResponseEvent;
+import com.fourirbnb.reservation.application.event.PaymentCancelResponseEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -19,8 +19,9 @@ public class PaymentCancelResponseListener {
   @KafkaListener(topics = "payment-cancel-response-topic", groupId = "reservation-group")
   public void listen(String message) {
     try {
-      PaymentResponseEvent event = objectMapper.readValue(message, PaymentResponseEvent.class);
-      reservationMessageService.updateStatusFromPayment(event);
+      PaymentCancelResponseEvent event = objectMapper.readValue(message,
+          PaymentCancelResponseEvent.class);
+      reservationMessageService.updateStatusFromCancelResponse(event);
     } catch (Exception e) {
       log.info("예약 취소 실패 : {}", e.getMessage());
       throw new InternalServerException(e.getMessage());

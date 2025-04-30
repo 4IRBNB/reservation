@@ -1,6 +1,5 @@
 package com.fourirbnb.reservation.infrastructure.kafka;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fourirbnb.common.exception.InternalServerException;
 import com.fourirbnb.reservation.application.event.PaymentRequestEvent;
@@ -25,7 +24,7 @@ public class kafkaPaymentRequestPublisher implements PaymentRequestPublisher {
       String json = objectMapper.writeValueAsString(event);
       kafkaTemplate.send("payment-request-topic", json);
       log.info("Published payment completed : {}", event.reservationId());
-    } catch (JsonProcessingException e) {
+    } catch (Exception e) {
       log.info("결제 요청 실패 : {}", e.getMessage());
       throw new InternalServerException(e.getMessage());
     }
