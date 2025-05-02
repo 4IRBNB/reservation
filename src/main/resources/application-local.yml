@@ -34,6 +34,18 @@ spring:
     listener:
       ack-mode: record  # record 단위 ack (원하면 MANUAL로 변경 가능)
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+  endpoint:
+    health:
+      show-details: always
+    prometheus:
+      enabled: true
+
 common:
   jpa:
     enabled: true

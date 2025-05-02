@@ -2,6 +2,7 @@ package com.fourirbnb.reservation.presentation.controller;
 
 import com.fourirbnb.common.response.BaseResponse;
 import com.fourirbnb.common.response.Pagination;
+import com.fourirbnb.reservation.application.dto.CacheResponseDto;
 import com.fourirbnb.reservation.application.dto.CreateReservationInternalDto;
 import com.fourirbnb.reservation.application.dto.ReservationResponseInternalDto;
 import com.fourirbnb.reservation.application.service.ReservationFacade;
@@ -91,19 +92,19 @@ public class ReservationController {
   public BaseResponse<List<ReservationResponseDto>> getLodgeReservations(
       @RequestParam UUID lodgeId, Pageable pageable) {
 
-    Page<ReservationResponseInternalDto> responsePage = reservationService
-        .getLodgeReservations(lodgeId, pageable);
+    CacheResponseDto<ReservationResponseInternalDto> reservations =
+        reservationService.getLodgeReservations(lodgeId, pageable);
 
     Pagination pagination = new Pagination(
-        responsePage.getTotalPages(),
-        responsePage.getTotalElements(),
-        responsePage.getNumber(),
-        responsePage.getNumberOfElements()
+        reservations.getTotalPages(),
+        reservations.getTotalElements(),
+        reservations.getPageNumber(),
+        reservations.getPageSize()
     );
 
     return BaseResponse.SUCCESS(
-        ReservationDtoMapper.toResponseList(responsePage.getContent()),
-        "숙소의 예약 목록 조회 성공", pagination
+        ReservationDtoMapper.toResponseList(reservations.getContent()),
+        "객실 예약 조회 성공", pagination
     );
   }
 
