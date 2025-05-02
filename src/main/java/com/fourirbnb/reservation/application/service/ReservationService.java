@@ -1,6 +1,7 @@
 package com.fourirbnb.reservation.application.service;
 
 import com.fourirbnb.common.exception.ResourceNotFoundException;
+import com.fourirbnb.reservation.application.dto.CacheResponseDto;
 import com.fourirbnb.reservation.application.dto.CreateReservationInternalDto;
 import com.fourirbnb.reservation.application.dto.ReservationResponseInternalDto;
 import com.fourirbnb.reservation.application.dto.UpdateReservationInternalDto;
@@ -75,8 +76,8 @@ public class ReservationService {
       cacheNames = "reservationCache",
       key = "'lodge:'+#lodgeId.toString()"
   )
-  public Page<ReservationResponseInternalDto> getLodgeReservations(UUID lodgeId,
-      Pageable pageable) {
+  public CacheResponseDto<ReservationResponseInternalDto> getLodgeReservations(
+      UUID lodgeId, Pageable pageable) {
 
     Page<Reservation> reservationPage = reservationRepository.findAllByLodgeId(lodgeId, pageable);
 
@@ -84,7 +85,10 @@ public class ReservationService {
       throw new ResourceNotFoundException("예약 조회 실패 : 예약이 존재하지 않음");
     }
 
-    return ReservationMapper.toResponsePage(reservationPage);
+    Page<ReservationResponseInternalDto> dtoPage =
+        ReservationMapper.toResponsePage(reservationPage);
+
+    return new CacheResponseDto<>(dtoPage);
   }
 
   @Transactional(readOnly = true)
